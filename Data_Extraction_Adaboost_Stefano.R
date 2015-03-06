@@ -1,4 +1,4 @@
-setwd('/Users/StephenCarmody/Documents/Machine Learning Competition/')
+setwd("~/Dropbox/MSc Data Science/Courses/006 - Machine Learning (14D005)/Competition/ThyNearestNeighbours")
 rm( list=ls() )
 
 if (!require("class")) install.packages("class")
