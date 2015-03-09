@@ -1,86 +1,35 @@
+library(adabag)
+
 setwd("~/Dropbox/MSc Data Science/Courses/006 - Machine Learning (14D005)/Competition/ThyNearestNeighbours")
-rm( list=ls() )
-
-if (!require("class")) install.packages("class")
-library(class)
-
-if (!require("foreach")) install.packages("foreach")
-library(foreach)
-
-if (!require("doSNOW")) install.packages("doSNOW")
-library(doSNOW)
-
-# read in intial data
-D <- read.table("Kaggle_Covertype_training.csv", head = TRUE, stringsAsFactors=FALSE)
-
-# grab column names
-colNames <- names(D)
-
-# convert column names from one joined string to seperate column names
-colNames <- strsplit(colNames, '[.]')
-colNames <- unlist(colNames)
-
-# create empty data frame
-data.raw <- data.frame()
-
-# each row is a long string. Here we split up each variable and put it its appropriate column
-data.raw <- t(data.frame(strsplit(D[,], ','), stringsAsFactors = FALSE))
-rownames(data.raw) <- NULL
-data.raw <- data.frame(data.raw, stringsAsFactors = FALSE)
-names(data.raw) <- colNames
-
-dataCorrectMat <- data.matrix(data.raw)
-
-# Scales data for non boolean values
-data.scaled <- data.frame()
+D <- read.table("Kaggle_Covertype_training.csv", head = TRUE, sep=",")
 
 for(i in 2:11){
-  data.raw[,i] <- as.double(scale(as.numeric(data.raw[,i]), center = TRUE, scale = TRUE))
+  D[,i] <- as.double(scale(as.numeric(D[,i]), center = TRUE, scale = TRUE))
 }
-data.scaled <- data.raw
+data.scaled <- D
 
-# Limit amount of data used to save compute time
-data <- head(data.scaled, 5000)
+data <- D[1:5000,-1]
+data$Cover_Type = factor(data$Cover_Type)
+train <- data[1:4500,]
+test <- data[4501:5000,]
 
-numFolds <- 10
-kOpt <- c(1, 3, 5, 15, 45, 60, 90)
-foldList <- 1:(numFolds*length(kOpt))
-kList <- rep(kOpt, length(1:numFolds))
+# Trying with vanilla adabag package
 
-system.time(
-  resultsKnn<- foreach(i = foldList, k = kList,
-                      .combine=rbind, .packages=c("class", "dplyr")) %dopar% {
-                        
-                        # some helpful debugging messages
-                        cat("Sample ", i, " is the current test set! k = ", k, fill = TRUE)
-                        
-                        # random choice of row numbers for monte carlo cross validation
-                        sampleIndex <- sample(1:nrow(data), size = (nrow(data)*.9), replace = FALSE, prob = NULL)
-                        
-                        # select training data
-                        Xtrain <- data[sampleIndex,(2:ncol(data)-1)] 
-                        Ytrain <- data[sampleIndex,ncol(data)] 
-                        
-                        # select testing data
-                        Xtest <- data[-sampleIndex,(2:ncol(data)-1)]
-                        Ytest <- data[-sampleIndex,ncol(data)] 
-                        
-                        # kNN results
-                        testPredictions <- knn(train=Xtrain, test=Xtest, cl=Ytrain, k=k)
-                        testError <- mean(testPredictions != Ytest)
-                        
-                        # last thing is returned
-                        result <- c(i, k, testError)
-                      }
-)
+adafit <- boosting(Cover_Type ~ ., data = train)
+adapred <- predict.boosting(adafit, newdata = test)
+adaerror <- mean(adapred$class != test[,ncol(test)])
+adaerror
 
-# puts results in a data table
-results <- data.table(resultsKnn)
-results
-melt(results)
+# Trying with caret
 
-# writes scaled training data and error results to csv files
-write.table(data.scaled ,"training_Data_scaled.csv", sep = ",")
-write.table(results ,"classification_error_estimate.csv", sep = ",")
+library(caret)
+library(doMC)
+registerDoMC(cores = 3)
+## All subsequent models are then run in parallel
+cvCtrl <- trainControl(method = "repeatedcv", repeats = 1) # do 10-fold CV 1 time
+adafit <- train(Cover_Type ~ ., data = train, method = "AdaBoost.M1",trControl = cvCtrl)
+adapred <- predict.train(adafit, train)
+adaerror.c <- mean(adapred$class != test[,ncol(test)])
+adaerror.c
 
 
