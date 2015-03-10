@@ -8,28 +8,37 @@ for(i in 2:11){
 }
 data.scaled <- D
 
-data <- D[1:5000,-1]
+data <- D[,-1]
 data$Cover_Type = factor(data$Cover_Type)
-train <- data[1:4500,]
-test <- data[4501:5000,]
+train <- data[1:47000,]
+test <- data[47001:50000,]
 
-# Trying with vanilla adabag package
+# Trying with adabag package - BOOSTING
 
-adafit <- boosting(Cover_Type ~ ., data = train)
-adapred <- predict.boosting(adafit, newdata = test)
-adaerror <- mean(adapred$class != test[,ncol(test)])
-adaerror
+adafit.boo <- boosting(Cover_Type ~ ., data = train)
+adapred.boo <- predict.boosting(adafit.boo, newdata = test)
+adaerror.boo <- mean(adapred.boo$class != test[,ncol(test)])
+adaerror.boo
 
-# Trying with caret
+# Trying with adabag package - BOOSTING vith CV (10-fold)
 
-library(caret)
-library(doMC)
-registerDoMC(cores = 3)
-## All subsequent models are then run in parallel
-cvCtrl <- trainControl(method = "repeatedcv", repeats = 1) # do 10-fold CV 1 time
-adafit <- train(Cover_Type ~ ., data = train, method = "AdaBoost.M1",trControl = cvCtrl)
-adapred <- predict.train(adafit, train)
-adaerror.c <- mean(adapred$class != test[,ncol(test)])
-adaerror.c
+adafit.boo.cv <- boosting(Cover_Type ~ ., data = train)
+adapred.boo.cv <- predict.boosting(adafit.boo.cv, newdata = test)
+adaerror.boo.cv <- mean(adapred.boo.cv$class != test[,ncol(test)])
+adaerror.boo.cv
+
+# Trying with adabag package - BAGGING
+
+adafit.bag <- bagging(Cover_Type ~ ., data = train)
+adapred.bag <- predict.bagging(adafit.bag, newdata = test)
+adaerror.bag <- mean(adapred.bag$class != test[,ncol(test)])
+adaerror.bag
+
+# Trying with adabag package - BAGGING with CV (10-fold)
+
+adafit.bag.cv <- bagging.cv(Cover_Type ~ ., data = data)
+adafit.bag.cv$error
+
+
 
 
