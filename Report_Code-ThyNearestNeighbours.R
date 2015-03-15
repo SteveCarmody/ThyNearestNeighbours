@@ -43,6 +43,10 @@ training$Cover_Type <- as.factor(training$Cover_Type)
 
 ## Random Forest
 
+# ntree = 1400
+# mtry = 27
+# nodesize = 1
+
 # {MONIKA TO POPULATE}
 
 ### 3 - RESULTS ###
