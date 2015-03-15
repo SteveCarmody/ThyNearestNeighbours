@@ -10,14 +10,20 @@ TO DO
 [MAIN CODE]: Add code to run preferred SVM
 [MAIN CODE]: Add code to run preferred Bagging
 [MAIN CODE]: Add code to run preferred Random Forest
-[MAIN CODE]: Add code to make final prediction and store the results as CSV file
 
 [SUPPORT CODE]: Update code on Random Forest testing
 [SUPPORT CODE]: Implement code for kNN testing
 [SUPPORT CODE]: Implement code for SVM testing
 [SUPPORT CODE]: Implement code for Bagging testing
 
+[ANALYSIS]: Re-run Random Forest analysis on AWS
+[ANALYSIS]: Re-run kNN analysis on AWS
+[ANALYSIS]: Run bagging analysis on AWS
+[ANALYSIS]: Run SVM analysis on AWS
+
 
 DONE
 ==========
 
+[MAIN CODE]: Add code to make final prediction and store the results as CSV file
+[REPORT]: Write introduction

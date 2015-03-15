@@ -99,10 +99,94 @@ if (window.hljs && document.readyState && document.readyState === "complete") {
 </div>
 <div id="random-forest" class="section level3">
 <h3>Random Forest</h3>
+<p>We have tested a Random Forest approach by considering these ranges of parameters:</p>
+<ul>
+<li><strong>Number of trees in each iteration:</strong> [INSERT FINAL SET OF PARAMETERS]</li>
+<li><strong>Number of features considered in each iteration:</strong> [INSERT FINAL SET</li>
+<li><strong>Minimum node size:</strong> [IN CLASSIFICATION, I THINK THIS NEEDS TO BE =1 BUT WE CAN CHECK]</li>
+</ul>
+<p>The following table provides a summary of the best results:</p>
+<table>
+<thead>
+<tr class="header">
+<th align="center"># of trees</th>
+<th align="center"># of features</th>
+<th align="center">Nodesize</th>
+<th align="center">Test error</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">901</td>
+<td align="center">20</td>
+<td align="center">1</td>
+<td align="center">0.2070</td>
+</tr>
+<tr class="even">
+<td align="center">501</td>
+<td align="center">40</td>
+<td align="center">1</td>
+<td align="center">0.2076</td>
+</tr>
+<tr class="odd">
+<td align="center">1101</td>
+<td align="center">20</td>
+<td align="center">1</td>
+<td align="center">0.2080</td>
+</tr>
+<tr class="even">
+<td align="center">1301</td>
+<td align="center">25</td>
+<td align="center">1</td>
+<td align="center">0.2080</td>
+</tr>
+</tbody>
+</table>
+<p>The code to reproduce these results is provided in our repository on GitHub in the file <code>Random_Forest-ThyNearestNeighbours.R</code>.</p>
+<p>On this basis, for this technique we selected a Random Forest approach with these parameters:</p>
+<ul>
+<li>Number of trees: 901</li>
+<li>Number of features in each iteration: 20</li>
+<li>Node size: 1</li>
+</ul>
 </div>
 </div>
-<div id="section" class="section level2">
-<h2></h2>
+<div id="conclusions" class="section level2">
+<h2>Conclusions</h2>
+<p>The following table summarises the best result that we have achieved with each of the techiques we have tested.</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Technique</th>
+<th align="center">Test Error</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">kNN</td>
+<td align="center">0.000</td>
+</tr>
+<tr class="even">
+<td align="left">SVM</td>
+<td align="center">0.000</td>
+</tr>
+<tr class="odd">
+<td align="left">Bagging</td>
+<td align="center">0.000</td>
+</tr>
+<tr class="even">
+<td align="left">RF</td>
+<td align="center">0.000</td>
+</tr>
+</tbody>
+</table>
+<p>On the basis of the results above, we have selected <strong>[ADD SELECTED APPROACH]</strong>, using the following parameters:</p>
+<ul>
+<li>Parameter 1</li>
+<li>Parameter 2</li>
+<li>Parameter 3</li>
+</ul>
+<p>We have used this approach to make our final submission to Kaggle which yielded a score of <strong>[REPORT KAGGLE SCORE OF OUR PREFERRED SUBMISSION]</strong></p>
 </div>
 
 

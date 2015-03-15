@@ -59,8 +59,12 @@ D <- read.table("Kaggle_Covertype_test.csv", head = TRUE, sep=",")
 test <- D[,-1] # Remove ID column
 
 ## Use preferred model for prediction
+labels <- predict( # insert preferred model here )
+ids <- seq(50001,150000,1)
+submission <- cbind(ids,labels)
+colnames(submission) <- c("id","Cover_Type")
 
 ## Save the results as CSV file in the required format
-
+write.csv(submission,"ThyNearestNeighbour-submission.csv",row.names=F)
 
 

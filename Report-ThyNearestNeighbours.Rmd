@@ -50,8 +50,49 @@ __[NOT SURE WE SHOULD INCLUDE THIS, IT DOES NOT LOOK TOO PROMISING]__
 
 ### Random Forest
 
+We have tested a Random Forest approach by considering these ranges of parameters:
+
+- __Number of trees in each iteration:__ [INSERT FINAL SET OF PARAMETERS]
+- __Number of features considered in each iteration:__ [INSERT FINAL SET 
+- __Minimum node size:__ [IN CLASSIFICATION, I THINK THIS NEEDS TO BE =1 BUT WE CAN CHECK]
+
+The following table provides a summary of the best results:
+
+|# of trees| # of features | Nodesize | Test error |
+|:--------:|:-------------:|:--------:|:----------:|
+| 901      |  20           | 1        |   0.2070   |
+| 501      |  40           | 1        |   0.2076   |
+| 1101     |  20           | 1        |   0.2080   |
+| 1301     |  25           | 1        |   0.2080   |
+
+The code to reproduce these results is provided in our repository on GitHub in the file `Random_Forest-ThyNearestNeighbours.R`.
+
+On this basis, for this technique we selected a Random Forest approach with these parameters:
+
+- Number of trees: 901
+- Number of features in each iteration: 20 
+- Node size: 1
+
+## Conclusions
+
+The following table summarises the best result that we have achieved with each of the techiques we have tested.
+
+|Technique | Test Error |
+|:---------|:----------:|
+| kNN      |  0.000     |
+| SVM      |  0.000     |
+| Bagging  |  0.000     |
+| RF       |  0.000     |
+
+On the basis of the results above, we have selected __[ADD SELECTED APPROACH]__, using the following parameters:
+
+- Parameter 1
+- Parameter 2
+- Parameter 3
+
+We have used this approach to make our final submission to Kaggle which yielded a score of __[REPORT KAGGLE SCORE OF OUR PREFERRED SUBMISSION]__
 
 
-##
+
 
 
