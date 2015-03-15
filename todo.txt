@@ -1,0 +1,23 @@
+TO DO
+==========
+
+[REPORT]: Write section on kNN
+[REPORT]: Write section on SVM
+[REPORT]: Write section on Bagging
+[REPORT]: Write section on Random Forest
+
+[MAIN CODE]: Add code to run preferred kNN
+[MAIN CODE]: Add code to run preferred SVM
+[MAIN CODE]: Add code to run preferred Bagging
+[MAIN CODE]: Add code to run preferred Random Forest
+[MAIN CODE]: Add code to make final prediction and store the results as CSV file
+
+[SUPPORT CODE]: Update code on Random Forest testing
+[SUPPORT CODE]: Implement code for kNN testing
+[SUPPORT CODE]: Implement code for SVM testing
+[SUPPORT CODE]: Implement code for Bagging testing
+
+
+DONE
+==========
+
