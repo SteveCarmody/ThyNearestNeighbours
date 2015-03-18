@@ -19,14 +19,14 @@ data1 <- data1[,c(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24
 set.seed(1234)
 subset <- sample(seq(1,40000,1),40000) # random subsetting of training data
 
-xTrain <- data1[subset.train,2:(ncol(data1)-1)]
+xTrain <- data1[subset,2:(ncol(data1)-1)]
 xTrain <- sapply(xTrain,as.numeric)
-yTrain <- data1[subset.train,58]
+yTrain <- data1[subset,58]
 yTrain <- factor(yTrain)
 
-xTest <- data1[subset.test,2:(ncol(data1)-1)]
+xTest <- data1[-subset,2:(ncol(data1)-1)]
 xTest <- sapply(xTest,as.numeric)
-yTest <- data1[subset.test,58]
+yTest <- data1[-subset,58]
 yTest <- factor(yTest)
 
 ##################################################
