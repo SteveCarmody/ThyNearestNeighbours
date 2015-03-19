@@ -10,7 +10,7 @@ library(data.table)
 data <- read.csv("Kaggle_Covertype_training.csv", header = TRUE, sep = ",")
 data1 <- data
 
-# Perfrom feature construction
+# Perform feature construction
 data1 <- cbind(data1, EVDtH_1 = data1$elevation-data1$ver_dist_hyd)
 data1 <- cbind(data1, EHDtH_2 = data1$elevation-(data1$hor_dist_hyd*0.2))
 data1 <- data1[,c(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,

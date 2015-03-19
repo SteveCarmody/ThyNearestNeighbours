@@ -74,11 +74,11 @@ if (window.hljs && document.readyState && document.readyState === "complete") {
 <p>Our first step to address this classification problem was to identify a short-list of tecniques that could be used. We review the existing literature and identified a longlist of possible candidates. For each of these techniques we carried out some preliminary testing to check whether they warrated further assessement.</p>
 <p>During this initial testing phase, we decided to discard some approach that were not delivering acceptable results. For example, we tested the <strong>Adaboost.M1</strong> algorithm (using the <code>R</code> package <code>adabag</code>) and found the error to be too high. Specifically, the test error on a 10% holdout sample was <strong>0.282</strong> and the 10-fold cross validation error was <strong>0.276.</strong> We decided not to pursue this approach further.</p>
 <p><strong>[STEPHEN: COULD WE ADD SOMETHING ON NEURAL NETS]</strong></p>
+<p><strong><em>Techniques shortlist</em></strong></p>
 <p>At the end of this initial phase we identified a shortlist of techniques to explore further. These are:</p>
 <ul>
 <li>k-Nearest Neighbour rule</li>
 <li>Support Vector Machines <strong>[NOT SURE WE SHOULD INCLUDE THIS, ERRORS ARE QUITE HIGH]</strong></li>
-<li>Bagging</li>
 <li>Random Forests</li>
 </ul>
 <p>For each technique, we implemented the following testing procedure:</p>
@@ -87,24 +87,60 @@ if (window.hljs && document.readyState && document.readyState === "complete") {
 <li>We implemented the testing, parallelising the calculations over the “testing grid”. We did this by means of the <code>foreach</code>, <code>snow</code> and <code>doSNOW</code> <code>R</code> packages. We trained each model on 40,000 observations and calculated the test error on a hold-out sample of 10,000 observation,<br /></li>
 <li>We summarised the results of the multiple testing in a data table and selected the specification yielding the lowest test error.</li>
 </ol>
+<p><strong><em>Feature construction</em></strong></p>
+<p><strong>[ADD HERE A BRIEF DISCUSSION OF THE FEATURES WE HAVE CONSTRUCTED]</strong></p>
 <div id="k-nn" class="section level3">
 <h3>k-NN</h3>
+<p>We have tested a k-NN approach by considering these values of the parameter <span class="math">\(k\)</span>, i.e. the number of neighbour observations to consider in order to assign a class:</p>
+<ul>
+<li><span class="math">\(k = 1,3,5,7,9,11,13,15,17,19,23,27,29,31,37,41,43,47,51\)</span></li>
+</ul>
+<p>The following table provides a summary of the 5 best results:</p>
+<table>
+<thead>
+<tr class="header">
+<th align="center"># of trees</th>
+<th align="center">Test error</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">1</td>
+<td align="center">0.0996</td>
+</tr>
+<tr class="even">
+<td align="center">3</td>
+<td align="center">0.1181</td>
+</tr>
+<tr class="odd">
+<td align="center">5</td>
+<td align="center">0.1346</td>
+</tr>
+<tr class="even">
+<td align="center">7</td>
+<td align="center">0.1431</td>
+</tr>
+<tr class="odd">
+<td align="center">9</td>
+<td align="center">0.1538</td>
+</tr>
+</tbody>
+</table>
+<p>The code to reproduce these results is provided in our repository on GitHub in the file <code>kNN-ThyNearestNeighbours.R</code>.</p>
+<p>On this basis, for this technique we selected a 1-NN approach.</p>
 </div>
 <div id="svm" class="section level3">
 <h3>SVM</h3>
 <p><strong>[NOT SURE WE SHOULD INCLUDE THIS, IT DOES NOT LOOK TOO PROMISING]</strong></p>
 </div>
-<div id="bagging" class="section level3">
-<h3>Bagging</h3>
-</div>
 <div id="random-forest" class="section level3">
 <h3>Random Forest</h3>
 <p>We have tested a Random Forest approach by considering these ranges of parameters:</p>
 <ul>
-<li><strong>Number of trees in each iteration:</strong> from 100 to 1,500, with an increment of 100.</li>
+<li><strong>Number of trees in each iteration:</strong> from 50 to 1,450, with an increment of 50.</li>
 <li><strong>Number of features considered in each iteration:</strong> from 3 to 30, with an increment of 3.</li>
 </ul>
-<p>The following table provides a summary of the best results:</p>
+<p>The following table provides a summary of the 5 best results:</p>
 <table>
 <thead>
 <tr class="header">
@@ -115,31 +151,36 @@ if (window.hljs && document.readyState && document.readyState === "complete") {
 </thead>
 <tbody>
 <tr class="odd">
-<td align="center">1400</td>
+<td align="center">1350</td>
 <td align="center">27</td>
-<td align="center">0.1153</td>
+<td align="center">0.1082</td>
 </tr>
 <tr class="even">
-<td align="center">1000</td>
+<td align="center">450</td>
 <td align="center">30</td>
-<td align="center">0.1160</td>
+<td align="center">0.1082</td>
 </tr>
 <tr class="odd">
-<td align="center">1000</td>
-<td align="center">30</td>
-<td align="center">0.1161</td>
+<td align="center">350</td>
+<td align="center">27</td>
+<td align="center">0.1083</td>
 </tr>
 <tr class="even">
-<td align="center">1500</td>
+<td align="center">950</td>
 <td align="center">30</td>
-<td align="center">0.1161</td>
+<td align="center">0.1083</td>
+</tr>
+<tr class="odd">
+<td align="center">450</td>
+<td align="center">30</td>
+<td align="center">0.1084</td>
 </tr>
 </tbody>
 </table>
 <p>The code to reproduce these results is provided in our repository on GitHub in the file <code>Random_Forest-ThyNearestNeighbours.R</code>.</p>
 <p>On this basis, for this technique we selected a Random Forest approach with these parameters:</p>
 <ul>
-<li>Number of trees: 1400</li>
+<li>Number of trees: 1350</li>
 <li>Number of features in each iteration: 27</li>
 </ul>
 </div>
@@ -157,19 +198,15 @@ if (window.hljs && document.readyState && document.readyState === "complete") {
 <tbody>
 <tr class="odd">
 <td align="left">kNN</td>
-<td align="center">0.000</td>
+<td align="center">0.0996</td>
 </tr>
 <tr class="even">
 <td align="left">SVM</td>
-<td align="center">0.000</td>
+<td align="center">0.0000</td>
 </tr>
 <tr class="odd">
-<td align="left">Bagging</td>
-<td align="center">0.000</td>
-</tr>
-<tr class="even">
 <td align="left">RF</td>
-<td align="center">0.000</td>
+<td align="center">0.1082</td>
 </tr>
 </tbody>
 </table>
