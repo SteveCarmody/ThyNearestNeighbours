@@ -188,7 +188,7 @@ colnames(resultsKNN) <- c("k", "Error")
 resultsKNN <- data.table(resultsKNN)
 
 # ordering the results by ascending prediction error
-resultsKNN <- resultsKNN[with(resultsKNN, order(k)), ]
+resultsKNN <- resultsKNN[with(resultsKNN, order(Error)), ]
 
 # save results in .csv file
 write.csv(resultsKNN,"knn_testing.csv", row.names=F)
