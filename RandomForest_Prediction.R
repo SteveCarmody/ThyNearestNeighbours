@@ -2,6 +2,8 @@
 
 # Import and prepare data
 
+library(randomForest)
+
 setwd("C:/Users/Monika/Documents/Master/MachineLearning/Competition")
 
 training <- read.csv("Kaggle_Covertype_training.csv", header = TRUE, sep = ",")
