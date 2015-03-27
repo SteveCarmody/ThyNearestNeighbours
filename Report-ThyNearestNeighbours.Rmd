@@ -1,47 +1,90 @@
 ---
-title: "Machine Learning Competition"
+title: "Thy Nearest Neighbours"
 author: "Stephen Carmody, Stefano Costantini, Monika Krzyzanowska"
 date: "27 March 2015"
-output: html_document
+output: pdf_document
 ---
  
 ## Introduction
 
-This technical report summarises the analysis that our team (__'Thy Nearest Neighbours'__) has carried out for the Machine Learning competition. The objective is to provide an overview of our approach, showing the techniques we have considered and the results that have led us make our final submission to the competition.
+This technical report summarises the analysis that our team (__'Thy Nearest Neighbours'__) has carried out for the Machine Learning competition. The objective is to provide an overview of our approach, showing the techniques we have considered and the results that have led us make our final submission to the competition. The core of our analysis, implementing the training of the chosen classifiers and generating the predictions is provided in our Github repository in the file `Report_Code-ThyNearestNeighbours.R`
 
 The report is structured as follows:
 
-- First we describe the approach we have used to test the chosen techniques and to produce the results.
-- Then we discuss our results relative to the application of the shortlisted techniques. For each technique we show the results of the testing that we used to choose the method underpinning our final submission.
-- We conclude by showing our chosen technique and its results
+- First we describe the approach we have used to test the chosen techniques and to construct / modify the features of the dataset.
+- We then discuss our results relative to the application of the shortlisted techniques. For each technique we show the results of the testing that we used to choose the method underpinning our final submission.
+- We conclude by selecting our preferred option for our submission.
 
 ## Initial assessment and approach
 
-Our first step to address this classification problem was to identify a short-list of tecniques that could be used. We review the existing literature and identified a longlist of possible candidates. For each of these techniques we carried out some preliminary testing to check whether they warrated further assessement. 
+Our first step to address this classification problem was to identify a short-list of tecniques that could be used. We reviewed the existing literature and identified a longlist of possible candidates. For each of these techniques we carried out some preliminary testing to check whether they warrated further assessement. 
 
-During this initial testing phase, we decided to discard some approach that were not delivering acceptable results. For example, we tested the __Adaboost.M1__ algorithm (using the `R` package `adabag`) and found the error to be too high. Specifically, the test error on a 10% holdout sample was __0.282__ and the 10-fold cross validation error was __0.276.__ We decided not to pursue this approach further.
+During this initial testing phase, we decided to discard some approaches that were not delivering acceptable results. For example, we tested the __Adaboost.M1__ algorithm (using the `R` package `adabag`) and found the error to be too high. Specifically, the test error on a 20% holdout sample was __0.282__ and the 10-fold cross validation error was __0.276.__ We decided not to pursue this approach further. We also tested a __support vector machine__ but our best performance was a test error of __0.220__ on a 20% holdout sample.
 
-__[STEPHEN: COULD WE ADD SOMETHING ON NEURAL NETS]__
-
-___Techniques shortlist___
+___Classifiers shortlist___
 
 At the end of this initial phase we identified a shortlist of techniques to explore further. These are:
 
 - k-Nearest Neighbour rule
-- Support Vector Machines __[NOT SURE WE SHOULD INCLUDE THIS, ERRORS ARE QUITE HIGH]__
 - Random Forests
  
 For each technique, we implemented the following testing procedure:
 
 1. First we identified the set of parameters that we wished to change. On this basis we defined a "testing grid" to set out all possible combination of parameters.
-2. We implemented the testing, parallelising the calculations over the "testing grid". We did this by means of the `foreach`, `snow` and `doSNOW` `R` packages. We trained each model on 40,000 observations and calculated the test error on a hold-out sample of 10,000 observation,  
+2. We implemented the testing, parallelising the calculations over the "testing grid". We did this by means of the `foreach`, `snow` and `doSNOW` `R` packages. We trained each model on 40,000 observations and calculated the test error on a hold-out sample of 10,000 observation.
 3. We summarised the results of the multiple testing in a data table and selected the specification yielding the lowest test error.
 
 ___Feature construction___
 
-__[ADD HERE A BRIEF DISCUSSION OF THE FEATURES WE HAVE CONSTRUCTED]__
+After carrying out an initial exploratory analysis on a range of classifiers, and having chosen the most promising ones for further testing, we focused our efforts on feature engineering, i.e creating new features from the pre-existing data, in an attempt to improve algorithm accuracy. After finding good candidates, we manually constructed these features, we trained and optimised our most promising classifiers using the modified dataset.
 
-### k-NN
+The approach to feature construction is heuristic in nature, with the the first step in our process starting with graphing all features against each other to find relationships that may be exploited by the classifiers. Below we can see a linear relationship between __Elevation__ and __Horizontal distance to hydrology__. We can exploit this relationship to create a new feature, and using new test errors and feature analysis conclude if this new feature will benefit our model.
+
+![Example: Elevation vs. Vertical Distance to Road](figures/scatter.png)
+
+The package we used to rank feature importance is `Caret`, and more specifically the `varImp()` function. The function exams a trained model to rank the importance of features in predicting classes. As seen in the graph below, the graph lists the top features, ranked by importance, along with the percent of influence on the model.
+
+![Importance of features](figures/importance.png)
+
+This plot shows the relevance of new features we constructed. Three of the top 5 best predictors are manually constructed, accounting for almost 40% of the classification prediction. These are:
+
+- EHDtH: 	Elevation vs. Horizontal Distance to Hydrology
+- EVDtH: 	Elevation vs. Vertical Distance to Hydrology
+-	NewF4:	Elevation vs. Vertical Distance to Road
+
+Finally, after taking the rank of features importance, we can rate our classifiers effectiveness starting from a model with one variable to the full set of variables. In this way we can find a more parsimonious model the best amount of effective parameters to give a more parsimonious model. We note that this improved the results for our Random Forest classifier but had no significant effect on the KNN model.
+
+![Classification Accuracy vs. Number of features used by model](figures/accuracy.png)
+
+On the basis of these results we decided to include the newly constructed features in our final dataset. We also decided to remove many of the `soil_type` features which did not seem to have a particularly strong importance and did not affect the performance of the classifier.
+
+The code we used for the feature analysis can be found on our Github repository in the file `FeatureTesting.R`.
+
+## Classifier training
+
+### Random Forest
+
+We have tested a Random Forest approach by considering these ranges of parameters:
+
+- __Number of trees in each iteration:__ from 50 to 1,550, with an increment of 100.
+- __Number of features considered in each iteration:__ from 3 to 30, with an increment of 3.
+
+The following table provides a summary of the 5 best results:
+
+|# of trees| # of features | Test error |
+|:--------:|:-------------:|:----------:|
+| 1350     |  13           |   0.1038   |
+| 1250     |  10           |   0.1039   |
+| 850      |  10           |   0.1040   |
+| 350      |   9           |   0.1041   |
+| 250      |  12           |   0.1042   |
+
+On this basis, for this technique we selected a Random Forest approach with these parameters:
+
+- Number of trees: 1350
+- Number of features in each iteration: 13
+
+### k-Nearest Neighbour
 
 We have tested a k-NN approach by considering these values of the parameter $k$, i.e. the number of neighbour observations to consider in order to assign a class:
 
@@ -49,63 +92,28 @@ We have tested a k-NN approach by considering these values of the parameter $k$,
 
 The following table provides a summary of the 5 best results:
 
-|# of trees| Test error |
+|k         | Test error |
 |:--------:|:----------:|
-| 1        |   0.0996   |
-| 3        |   0.1181   |
-| 5        |   0.1346   |
-| 7        |   0.1431   |
-| 9        |   0.1538   |
-
-The code to reproduce these results is provided in our repository on GitHub in the file `kNN-ThyNearestNeighbours.R`.
+| 1        |   0.0977   |
+| 3        |   0.1129   |
+| 5        |   0.1320   |
+| 7        |   0.1404   |
+| 9        |   0.1510   |
 
 On this basis, for this technique we selected a 1-NN approach.
 
-### SVM
+### Conclusions
 
-__[NOT SURE WE SHOULD INCLUDE THIS, IT DOES NOT LOOK TOO PROMISING]__
+The following table summarises the best results that we have achieved with each of the techiques we have tested.
 
-### Random Forest
+|Technique      | Test Error |
+|:--------------|:----------:|
+| Random Forest |  0.1038    |  
+| kNN           |  0.0977    |
 
-We have tested a Random Forest approach by considering these ranges of parameters:
+On the basis of the results above, we have selected 1-NN approach, applied to a modified version of the dataset with new features included.
 
-- __Number of trees in each iteration:__ from 50 to 1,450, with an increment of 50.
-- __Number of features considered in each iteration:__ from 3 to 30, with an increment of 3.
-
-The following table provides a summary of the 5 best results:
-
-|# of trees| # of features | Test error |
-|:--------:|:-------------:|:----------:|
-| 1350     |  27           |   0.1082   |
-| 450      |  30           |   0.1082   |
-| 350      |  27           |   0.1083   |
-| 950      |  30           |   0.1083   |
-| 450      |  30           |   0.1084   |
-
-The code to reproduce these results is provided in our repository on GitHub in the file `Random_Forest-ThyNearestNeighbours.R`.
-
-On this basis, for this technique we selected a Random Forest approach with these parameters:
-
-- Number of trees: 1350
-- Number of features in each iteration: 27
-
-## Conclusions
-
-The following table summarises the best result that we have achieved with each of the techiques we have tested.
-
-|Technique | Test Error |
-|:---------|:----------:|
-| kNN      |  0.0996    |
-| SVM      |  0.0000    |
-| RF       |  0.1082    |
-
-On the basis of the results above, we have selected __[ADD SELECTED APPROACH]__, using the following parameters:
-
-- Parameter 1
-- Parameter 2
-- Parameter 3
-
-We have used this approach to make our final submission to Kaggle which yielded a score of __[REPORT KAGGLE SCORE OF OUR PREFERRED SUBMISSION]__
+We have used this approach to make our final submission to Kaggle which, on the 10% test set, yielded a score of 0.91820.
 
 
 
