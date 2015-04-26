@@ -13,7 +13,16 @@ library(doSNOW)
 if (!require("ggplot2")) install.packages("ggplot2")
 library(ggplot2)
 
+if (!require("caret")) install.packages("caret")
+library(caret)
+
+if (!require("mlbench")) install.packages("mlbench")
+library(mlbench)
+
 library(data.table)
+
+library(class)
+
 
 noCores <- 2
 cl <- makeCluster(noCores, type="SOCK", outfile="")
@@ -43,7 +52,7 @@ if(type == "predict")
 
 
 data.raw <- read.csv("Kaggle_Covertype_training.csv", head = TRUE, sep = ',')
-data.raw <- head(data.raw, 15000)
+data.raw <- head(data.raw, 5000)
 
 
 data.raw <- cbind(data.raw, EVDtH = data.raw$elevation-data.raw$ver_dist_hyd)         # 57
@@ -114,6 +123,7 @@ resultsKnn<- foreach(i = foldList, k = kList,
                        }
                        
                        # kNN results
+                       
                        testPredictions <- knn(train=data.train.X, test=data.test.X, cl=data.train.Y, k=k)
                        
                        if(type == "train")
@@ -150,10 +160,79 @@ if(type == "predict")
 
 stopCluster(cl)
 
+
+scaleData <- function(data){
+  
+  data.scaled <- data.frame()
+  
+  for(i in 2:11){
+    data.raw[,i] <- as.double(scale(as.numeric(data.raw[,i]), center = TRUE, scale = TRUE))
+  }
+  data.scaled <- data.raw
+  
+  return(data.scaled)
+}
+
+data.raw <- scaleData(data.raw)
+
 # Principle Component Analysis
 data.PCA <- data.raw[,2:(ncol(data.raw)-1)]
-res <- prcomp(data.PCA, center = TRUE, scale = FALSE)
+data.PCA <- prcomp(data.PCA, center = TRUE, scale = FALSE)
+plot(data.PCA, type = "b")
 plot(cumsum(res$sdev^2/sum(res$sdev^2)))
+
+summary(data.PCA)
+
+
+setwd('/Users/StephenCarmody/Documents/Machine Learning Competition/')
+rm( list=ls() )
+
+noCores <- 2
+cl <- makeCluster(noCores, type="SOCK", outfile="")
+registerDoSNOW(cl)
+
+type <- "train" # predict | train
+
+# read in intial data
+data.raw <- read.csv("Kaggle_Covertype_training.csv", head = TRUE, sep = ',')
+
+data.raw <- cbind(data.raw, EVDtH = data.raw$elevation-data.raw$ver_dist_hyd)         # 57
+data.raw <- cbind(data.raw, EHDtH = data.raw$elevation-(data.raw$hor_dist_hyd*0.2))   # 58
+data.raw <- cbind(data.raw, NewF4 = data.raw$elevation-(data.raw$hor_dist_road*0.3))  # 59
+
+data.raw <- data.raw[,c(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,
+                        31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,57,58,56)]
+
+data.raw <- head(data.raw, 5000)
+
+
+
+data.train.X <- data.raw[,2:(ncol(data.raw)-1)]
+data.train.Y <- data.raw[,ncol(data.raw)]
+
+model <- train(data.train.Y~., data=data.train.X, method="cforest")
+importance <- varImp(model, scale=FALSE)
+# summarize importance
+print(importance)
+# plot importance
+plot(importance)
+
+control <- rfeControl(functions=rfFuncs, method="cv", number=3)
+
+results <- rfe(data.train.X, data.train.Y , sizes=c(1:57), rfeControl=control)
+# summarize the results
+print(results)
+# list the chosen features
+predictors(results)
+# plot the results
+plot(results, type=c("g", "o"))
+
+write.csv((results$results) ,"Best_Feature_Selection_Results.csv",row.names=F)
+write.csv((predictors(results)) ,"Best_Feature_Selection_Predictors.csv",row.names=F)
+
+
+
+
 
 
 
